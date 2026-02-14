@@ -23,6 +23,7 @@
 //!     bed_type: gxf2bed::BedType::Bed12,
 //!     additional_fields: None,
 //!     chunks: 15000,
+//!     include_non_coding: false,
 //! };
 //!
 //! let stats = run(&config)?;
@@ -49,6 +50,7 @@
 //!     bed_type: BedType::Bed12,
 //!     additional_fields: None,
 //!     chunks: 15000,
+//!     include_non_coding: false,
 //! };
 //!
 //! let stats = run(&config)?;
@@ -71,6 +73,7 @@
 //!     bed_type: BedType::Bed12,
 //!     additional_fields: Some(vec!["gene_name".to_string(), "gene_biotype".to_string()]),
 //!     chunks: 15000,
+//!     include_non_coding: false,
 //! };
 //!
 //! let stats = run(&config)?;
@@ -93,6 +96,7 @@
 //!     bed_type: BedType::Bed12,
 //!     additional_fields: None,
 //!     chunks: 15000,
+//!     include_non_coding: false,
 //! };
 //!
 //! let stats = run(&config)?;

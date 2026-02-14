@@ -39,6 +39,7 @@ fn convert_gzipped_gtf() {
         bed_type: BedType::Bed12,
         additional_fields: None,
         chunks: 1024,
+        include_non_coding: false,
     };
 
     run(&config).unwrap();

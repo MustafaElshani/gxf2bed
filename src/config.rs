@@ -24,6 +24,8 @@ pub struct Config {
     pub additional_fields: Option<Vec<String>>,
     /// Chunk size for parallel processing.
     pub chunks: usize,
+    /// Whether to render non-coding transcripts as thin.
+    pub include_non_coding: bool,
 }
 
 impl Config {
@@ -63,6 +65,7 @@ impl Config {
             bed_type: args.bed_type,
             additional_fields: args.additional_fields.clone(),
             chunks: args.chunks,
+            include_non_coding: args.include_non_coding,
         }
     }
 }

@@ -112,6 +112,18 @@ pub struct Args {
         default_value_t = 15000
     )]
     pub chunks: usize,
+
+    /// Include non-coding transcripts with thin BED rendering.
+    ///
+    /// When set, transcripts without CDS features will have thickStart == thickEnd,
+    /// rendering them as thin lines in BED viewers (instead of the default behavior
+    /// where they appear fully thick/coding).
+    #[clap(
+        long = "include-non-coding",
+        help = "Render non-coding transcripts as thin (thickStart == thickEnd)",
+        default_value_t = false
+    )]
+    pub include_non_coding: bool,
 }
 
 /// Supported output BED formats.

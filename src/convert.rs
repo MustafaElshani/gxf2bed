@@ -95,6 +95,7 @@ pub fn run(config: &Config) -> Result<RunStats> {
 /// * `reader_options` - Reader configuration options
 /// * `config` - Main conversion configuration
 /// * `writer_options` - Writer configuration options
+/// * `include_non_coding` - If true, set thickStart==thickEnd for non-coding transcripts
 ///
 /// # Returns
 ///
@@ -147,6 +148,7 @@ fn process_input(
 /// * `reader_options` - Reader configuration options
 /// * `config` - Main conversion configuration
 /// * `writer_options` - Writer configuration options
+/// * `include_non_coding` - If true, set thickStart==thickEnd for non-coding transcripts
 /// * `compression` - Compression type of the input
 ///
 /// # Returns
@@ -177,7 +179,7 @@ where
     let reader = open_reader::<F>(path, reader_options, compression)?;
     let mut outputs = reader
         .par_chunks(config.chunks)?
-        .map(|(idx, chunk)| render_chunk(idx, chunk, config.bed_type, writer_options))
+        .map(|(idx, chunk)| render_chunk(idx, chunk, config.bed_type, writer_options, config.include_non_coding))
         .collect::<Vec<_>>();
 
     let mut merged = Vec::with_capacity(outputs.len());
@@ -320,6 +322,7 @@ fn build_writer_options(config: &Config) -> WriterOptions {
 /// * `chunk` - Vector of parsed GenePred records
 /// * `bed_type` - Target BED format type
 /// * `writer_options` - Writer configuration options
+/// * `include_non_coding` - If true, set thickStart==thickEnd for non-coding transcripts
 ///
 /// # Returns
 ///
@@ -340,12 +343,17 @@ fn render_chunk(
     chunk: Vec<genepred::ReaderResult<GenePred>>,
     bed_type: BedType,
     writer_options: &WriterOptions,
+    include_non_coding: bool,
 ) -> Result<(usize, Vec<u8>)> {
     let mut buffer = Vec::with_capacity(chunk.len().saturating_mul(128));
     {
         let mut writer = BufWriter::with_capacity(128 * 1024, &mut buffer);
         for record in chunk {
-            let record = record?;
+            let mut record = record?;
+            if include_non_coding && record.thick_start().is_none() && record.thick_end().is_none() {
+                record.set_thick_start(Some(record.start()));
+                record.set_thick_end(Some(record.start()));
+            }
             write_record(&record, &mut writer, bed_type, writer_options)?;
         }
         writer.flush()?;
@@ -364,6 +372,7 @@ fn render_chunk(
 /// * `writer` - Output writer to write the BED record to
 /// * `bed_type` - Target BED format type
 /// * `writer_options` - Writer configuration options
+/// * `include_non_coding` - If true, set thickStart==thickEnd for non-coding transcripts
 ///
 /// # Returns
 ///
